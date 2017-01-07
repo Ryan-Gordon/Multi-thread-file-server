@@ -5,7 +5,7 @@ package ie.gmit.sw.client;
  * 
  */
 public class Context {
-	public static final String CONFIG_FILE="src/ie/gmit/sw/ClientConf.xml";
+	public static final String CONFIG_FILE="src/ie/gmit/sw/client/ClientConf.xml";
 	private String username;
 	private String server_host;
 	private String server_port;
