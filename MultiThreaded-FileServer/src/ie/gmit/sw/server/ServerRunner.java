@@ -24,6 +24,7 @@ public class ServerRunner {
 //			if(args[0]==null || args[0] instanceof String){
 //				System.out.println("No port number provided");
 //			}
+			//if no parameter provided
 			if(args.length == 0){
 				String home = System.getProperty("user.home"); //get the home directory of the user
 				port = 7777; //the default value for server

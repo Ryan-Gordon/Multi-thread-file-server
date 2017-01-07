@@ -8,7 +8,7 @@ public class Context {
 	public static final String CONFIG_FILE="src/ie/gmit/sw/client/ClientConf.xml";
 	private String username;
 	private String server_host;
-	private String server_port;
+	private int server_port;
 	private String download_dir;
 	
 	/*
@@ -41,12 +41,12 @@ public class Context {
 		this.server_host = server_host;
 	}
 
-	public String getServer_port() {
+	public int getServer_port() {
 		return server_port;
 	}
 
 	public void setServer_port(String server_port) {
-		this.server_port = server_port;
+		this.server_port = Integer.parseInt(server_port);
 	}
 
 	public String getDownload_dir() {

@@ -4,16 +4,15 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import ie.gmit.sw.requests.*;
-
 public class ClientRunner {
 	
 	
 	public static void main(String[]args) throws Throwable{
-		Context conf = new Context();
-		UI ui = new UI();
-		XMLParser parser = new XMLParser(conf);
-		parser.parse();
+		Context conf = new Context(); //a new context object used to hold the XML values
+		UI ui = new UI(); //a new UI object used to display the menu and do commands
+		XMLParser parser = new XMLParser(conf); 
+		parser.parse();//used to parse the xml and assign its valeus to conf object
+		ServerCommandsService commands = new ServerCommandsService(conf);
 		System.out.println(conf);		
 		int choice;
 		
@@ -27,10 +26,10 @@ public class ClientRunner {
 			switch(choice){
 			case 1:
 				//connect to server
+				commands.connectToServer();
 				break;
 			case 2:
 				//get file list from server
-				
 				break;
 			case 3:
 				//prompt for input, then attempt to find the file
@@ -43,7 +42,7 @@ public class ClientRunner {
 			
 		}//run this while loop until the ui.quit() method is called
 		
-		System.out.println("Client connection closing! Thank you :");
+		System.out.println("Client connection closing! Thank you.");
 		in.close();
 	}//main
 	

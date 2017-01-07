@@ -1,4 +1,4 @@
-package ie.gmit.sw;
+package ie.gmit.sw.server;
 
 /* This class provides a very simple implementation of a web server. As a web server
  * must be capable of handling multiple requests from web browsers at the same time,
@@ -18,24 +18,30 @@ package ie.gmit.sw;
 import java.io.*; //Contains classes for all kinds of I/O activity
 import java.net.*; //Contains basic networking classes
 
+import ie.gmit.sw.requests.*;
+
 public class WebServer {
 	private ServerSocket ss; //A server socket listens on a port number for incoming requests
-	
-	//The first 1024 ports require administrator privileges. We'll use 8080 instead. The range 
-	//of port numbers runs up to 2 ^ 16 = 65536 ports.
-	private static final int SERVER_PORT = 8080;  
+	private int port;
+	private String filePath;
 	
 	//The boolean value keepRunning is used to control the while loop in the inner class called
 	//Listener. The volatile keyword tells the JVM not to cache the value of keepRunning during
 	//optimisation, but to check it's value in memory before using it.
 	private volatile boolean keepRunning = true;
 	
-	
-	//A null constructor for the WebServer class
-	private WebServer(){
+	/*
+	 * A constructor for the WebSever class
+	 * We make this public because we are accessing it from another file ServerRunner.java
+	 * In the WebServer in class example this stays as private because we access it from within the class
+	 */
+	public WebServer(int port, String filePath){
 		try { //Try the following. If anything goes wrong, the error will be passed to the catch block
 			
-			ss = new ServerSocket(SERVER_PORT); //Start the server socket listening on port 8080
+			this.port = port;
+			this.filePath = filePath;
+			
+			ss = new ServerSocket(port); //Start the server socket listening on port 7777 as default or whatever port provided by user
 			
 			/* A Thread is a worker. A runnable is a job. We'll give the worker thread called "server"
 			 * the job of handling incoming requests from clients.
@@ -49,16 +55,11 @@ public class WebServer {
 			server.setPriority(Thread.MAX_PRIORITY); //Ask the Thread Scheduler to run this thread as a priority
 			server.start(); //The Hollywood Principle - Don't call us, we'll call you
 			
-			System.out.println("Server started and listening on port " + SERVER_PORT);
+			System.out.println("Server started and listening on port " + port);
 			
 		} catch (IOException e) { //Something nasty happened. We should handle error gracefully, i.e. not like this...
-			System.out.println("Yikes! Something bad happened..." + e.getMessage());
+			System.out.println("Error starting server! Error Message: " + e.getMessage());
 		}
-	}
-	
-	//A main method is required to start a standard Java application
-	public static void main(String[] args) {
-		new WebServer(); //Create an instance of a WebServer. This fires the constructor of WebServer() above on the main stack 
 	}
 	
 	
@@ -77,15 +78,27 @@ public class WebServer {
 					
 					Socket s = ss.accept(); //This is a blocking method, causing this thread to stop and wait here for an incoming request
 					
-					/* If we get to this line, it means that a client request was received and that the socket "s" is a real network
+					ObjectInputStream in = new ObjectInputStream(s.getInputStream());
+					Request request = (Request) in.readObject();
+					
+					if(request instanceof ListFilesRequest) {
+	                	((ListFilesRequest) request).setFilePath(filePath);
+	                }
+					
+					//Run the job on its own thread
+	                request.setSocket(s);
+	                /* If we get to this line, it means that a client request was received and that the socket "s" is a real network
 					 * connection between some computer and this programme. We'll farm out this request to a new Thread (worker), 
 					 * allowing us to handle the next incoming request (we could have many requests hitting the server at the same time),
 					 * so we have to be able to handle them quickly.
 					 */
-					new Thread(new HTTPRequest(s), "T-" + counter).start(); //Give the new job to the new worker and tell it to start work
+	                new Thread(request, "Request-" + counter).start(); //Give the new job to the new worker and tell it to start work
 					counter++; //Increment counter
 				} catch (IOException e) { //Something nasty happened. We should handle error gracefully, i.e. not like this...
 					System.out.println("Error handling incoming request..." + e.getMessage());
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
 		}
@@ -107,7 +120,7 @@ public class WebServer {
 		//The interface Runnable declare the method "public void run();" that must be implemented
         public void run() {
             try{ //Try the following. If anything goes wrong, the error will be passed to the catch block
-            	
+            	int requests = 0;
             	//Read in the request from the remote computer to this programme. This process is called Deserialization or Unmarshalling
             	ObjectInputStream in = new ObjectInputStream(sock.getInputStream());
                 Object command = in.readObject(); //Deserialise the request into an Object
