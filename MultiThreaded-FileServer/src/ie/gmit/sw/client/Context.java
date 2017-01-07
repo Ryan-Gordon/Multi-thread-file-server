@@ -1,4 +1,4 @@
-package ie.gmit.sw;
+package ie.gmit.sw.client;
 /*
  * Context.java is a class used to abstract a part of the xml parsing procedure
  * The class Context is a class simply for the storage of the xml config files values

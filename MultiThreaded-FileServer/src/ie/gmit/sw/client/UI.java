@@ -1,11 +1,11 @@
-package ie.gmit.sw;
+package ie.gmit.sw.client;
 
-import java.util.Scanner;
 
 public class UI {
+	private boolean active;
 	
 	public UI(){
-		
+		this.active = true;
 	}
 	
 	public void displayMenu() {
@@ -15,5 +15,11 @@ public class UI {
 		System.out.println("4. Quit");
 		
 		System.out.print("\nType Option [1-4] > ");
+	}
+	public boolean isActive(){
+		return active;
+	}
+	public void quit(){
+		this.active = false;
 	}
 }

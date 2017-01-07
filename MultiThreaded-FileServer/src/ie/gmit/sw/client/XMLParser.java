@@ -1,4 +1,4 @@
-package ie.gmit.sw;
+package ie.gmit.sw.client;
 import javax.xml.parsers.*;
 import org.w3c.dom.*;
 
@@ -11,7 +11,7 @@ public class XMLParser {
 	}
 	
 	
-	public void init() throws Throwable{
+	public void parse() throws Throwable{
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder();
 		Document doc = db.parse(Context.CONFIG_FILE);
