@@ -1,6 +1,7 @@
 package ie.gmit.sw.client;
 
-/* ClientRunner is main class for the client package
+/* 
+ * @description ClientRunner is main class for the client package
  * It makes use of all the other classes within the ie.gmit.sw.client package
  * 
  * The Client handles logic processing for which files it wants, what IP and Port to try connecting to etc

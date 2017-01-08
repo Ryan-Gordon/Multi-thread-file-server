@@ -1,17 +1,19 @@
 package ie.gmit.sw.server;
 
-/* ServerRunner is main class for the server package
+/*
+ * ServerRunner is main class for the server package.
  * The ServerRunner can take in parameters from the user on run
  * The typical expected parameters are <port> <filePath>
- * 
+ * <p>
  * Alternatively you can also provide only one of these parameters if you wish
  * the runner has code to handle only one input.
  * We handle this by validating whether the arg is a valid directory on the machine
  * Or if it is a portnumber
- * 
+ * <p>
  * If no paarameters are provided the Server will run with default values
- * @default serverPort 7777
- * @default filePath ./server-files/ where '.' is a relative path
+ * 
+ * @param serverPort @default 7777
+ * @param filePath @default ./server-files/ where '.' is a relative path
  */
 
 import java.io.File;

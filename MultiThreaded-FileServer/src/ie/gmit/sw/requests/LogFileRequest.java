@@ -17,7 +17,7 @@ public class LogFileRequest implements Runnable {
 	public void run() {
 		while(keepRunning) {
 			try {
-				fw = new FileWriter(new File("log.txt"), true);
+				fw = new FileWriter(new File("log.txt"),true);
 				Request request = logRequestQueue.take();
 				System.out.println(request.toString());
 				fw.write(request.toString() + "\n");
