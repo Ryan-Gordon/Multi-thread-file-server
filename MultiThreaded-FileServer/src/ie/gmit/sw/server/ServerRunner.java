@@ -1,5 +1,19 @@
 package ie.gmit.sw.server;
 
+/* ServerRunner is main class for the server package
+ * The ServerRunner can take in parameters from the user on run
+ * The typical expected parameters are <port> <filePath>
+ * 
+ * Alternatively you can also provide only one of these parameters if you wish
+ * the runner has code to handle only one input.
+ * We handle this by validating whether the arg is a valid directory on the machine
+ * Or if it is a portnumber
+ * 
+ * If no paarameters are provided the Server will run with default values
+ * @default serverPort 7777
+ * @default filePath ./server-files/ where '.' is a relative path
+ */
+
 import java.io.File;
 import java.nio.file.Files;
 
@@ -21,9 +35,7 @@ public class ServerRunner {
 			 * if the user did provide something but we can't use it for port || filePath
 			 * then we will close the program.
 			 * */
-//			if(args[0]==null || args[0] instanceof String){
-//				System.out.println("No port number provided");
-//			}
+			
 			//if no parameter provided
 			if(args.length == 0){
 				System.out.println("No arguements provided. Defaulting to port 7777 and desktop/files dir");
@@ -32,7 +44,8 @@ public class ServerRunner {
 				filePath = "./server-files"; //the default directory is the desktop folder of the server. 
 			}
 			/*
-			 * If we only get one parameter, we will check it and see if we can work with it
+			 * If we only get one parameter, we will check it and see if we can work with it.
+			 * We shouldnt burden the user with a strict 2 parameter policy.
 			 */
 			else if(args.length ==1){
 				System.out.println("Only 1 parameter provided");
@@ -53,14 +66,18 @@ public class ServerRunner {
 					port = Integer.parseInt(args[0]);
 				}
 			}
-				
+			//if we get here it means we received more than 1 parameter and 1 or more of them was invalid.	
 			else{
+				System.out.println("Received 2+ parameters but unable to use them. \n Please submit <port> <path>.");
+
 				return;
 			}
 		}
 		new WebServer(port, filePath);
 	} //end main()
+	//Used to check if the string can be parsed into an int
 	public static boolean isInteger(String s) {
+		//tryparse into int
 	    try { 
 	        Integer.parseInt(s); 
 	    } catch(NumberFormatException e) { 
@@ -68,7 +85,7 @@ public class ServerRunner {
 	    } catch(NullPointerException e) {
 	        return false;
 	    }
-	    // only got here if we didn't return false
+	    // only got here if have a valid int
 	    return true;
 	}
 }

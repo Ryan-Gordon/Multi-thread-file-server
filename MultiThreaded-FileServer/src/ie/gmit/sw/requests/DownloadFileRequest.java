@@ -13,14 +13,16 @@ public class DownloadFileRequest extends Request {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	private static final String command = "Download";
+	
 
 	private String filePath;
 	private String fileName;
 	
+	private String command;
 	public DownloadFileRequest(String ipAddress, String fileName) {
 		super(ipAddress);
 		this.fileName = fileName;
+		this.command = "File: "+this.fileName+" - Download";
 	}
 
 	@Override
@@ -35,6 +37,7 @@ public class DownloadFileRequest extends Request {
 			
 			ObjectOutputStream out = new ObjectOutputStream(super.getSocket().getOutputStream());
 			out.writeObject("Success");
+			command = "File: "+fileName+" - Download";
 			out.writeObject(byteArray);
 			out.flush();
 			

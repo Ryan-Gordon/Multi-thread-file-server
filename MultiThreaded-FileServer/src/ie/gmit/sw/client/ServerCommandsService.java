@@ -1,5 +1,15 @@
 package ie.gmit.sw.client;
 
+/* ServerCommandsService 
+ * The ServerCommandsService contains the various services the Server offers
+ * Some of the services we require from the server need some sort of configuration first.
+ * i.e a speicified file for a downloadRequest
+ * 
+ * The server should in my opinion should only take Request commands and provide responses 
+ */
+
+
+
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;

@@ -17,6 +17,8 @@ package ie.gmit.sw.server;
 
 import java.io.*; //Contains classes for all kinds of I/O activity
 import java.net.*; //Contains basic networking classes
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 import ie.gmit.sw.requests.*;
 
@@ -29,6 +31,11 @@ public class WebServer {
 	//Listener. The volatile keyword tells the JVM not to cache the value of keepRunning during
 	//optimisation, but to check it's value in memory before using it.
 	private volatile boolean keepRunning = true;
+	
+	//Used for blocking queue. We will allow up to 10 logged requests in the blocking queue
+	private static final int QUEUE_SIZE = 10;
+	//A blocking queue used to queue logs. Many producer threads add to the blocking queue and 1 consumer thread takes these requests and logs them to a file 
+	BlockingQueue<Request> logRequestQueue = new ArrayBlockingQueue<>(QUEUE_SIZE);
 	
 	/*
 	 * A constructor for the WebSever class
@@ -55,13 +62,14 @@ public class WebServer {
 			server.setPriority(Thread.MAX_PRIORITY); //Ask the Thread Scheduler to run this thread as a priority
 			server.start(); //The Hollywood Principle - Don't call us, we'll call you
 			
+			
+			new Thread(new LogFileRequest(logRequestQueue), "RequestLogger").start();
 			System.out.println("Server started and listening on port " + port);
 			
 		} catch (IOException e) { //Something nasty happened. We should handle error gracefully, i.e. not like this...
 			System.out.println("Error starting server! Error Message: " + e.getMessage());
 		}
-	}
-	
+	}//End constructor
 	
 	
 	/* The inner class Listener is a Runnable, i.e. a job that can be given to a Thread. The job that
@@ -88,6 +96,7 @@ public class WebServer {
 	                }
 					else if (request instanceof DownloadFileRequest) {
 	                	((DownloadFileRequest) request).setFilePath(filePath); //Initialize the file path before firing the request
+	                	
 	                }
 					
 					//Run the job on its own thread
@@ -97,51 +106,15 @@ public class WebServer {
 					 * allowing us to handle the next incoming request (we could have many requests hitting the server at the same time),
 					 * so we have to be able to handle them quickly.
 					 */
-	                new Thread(request, "Request-" + counter).start(); //Give the new job to the new worker and tell it to start work
-					counter++; //Increment counter
-				} catch (IOException e) { //Something nasty happened. We should handle error gracefully, i.e. not like this...
+		             new Thread(request, "Request-" + counter).start(); //Give the new job to the new worker and tell it to start work
+		             logRequestQueue.put(request); //Add the request to the blocking queue invoking the toString method for the request thread
+	                
+	             
+	                counter++; //Increment counter
+				} catch (Exception e) { //Something nasty happened. We should handle error gracefully, i.e. not like this...
 					System.out.println("Error handling incoming request..." + e.getMessage());
-				} catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
-			}
-		}
+			}//End of while
+		}//End of run
 	}//End of inner class Listener
-	
-	
-	/* The inner class HTTPRequest is a Runnable, i.e. a job that can be given to a Thread. The job that
-	 * the class has been given is to handle an individual client request, by reading information from the
-	 * socket's input stream (bytes) and responding by sending information to the socket's output stream (more
-	 * bytes).
-	 */
-	private class HTTPRequest implements Runnable{
-		private Socket sock; //A specific socket connection between some computer on a network and this programme
-		
-		private HTTPRequest(Socket request) { //Taking the client socket as a constructor enables the Listener class above to farm out the request quickly
-			this.sock = request; //Assign to the instance variable sock the value passed to the constructor. 
-		}
-
-		//The interface Runnable declare the method "public void run();" that must be implemented
-        public void run() {
-            try{ //Try the following. If anything goes wrong, the error will be passed to the catch block
-            	int requests = 0;
-            	//Read in the request from the remote computer to this programme. This process is called Deserialization or Unmarshalling
-            	ObjectInputStream in = new ObjectInputStream(sock.getInputStream());
-                Object command = in.readObject(); //Deserialise the request into an Object
-                System.out.println(command);
-                
-                //Write out a response back to the client. This process is called Serialization or Marshalling
-                String message = "<h1>Happy Days</h1>";
-            	ObjectOutputStream out = new ObjectOutputStream(sock.getOutputStream());
-                out.writeObject(message);
-                out.flush();
-                out.close(); //Tidy up after and don't wolf up resources unnecessarily
-                
-            } catch (Exception e) { //Something nasty happened. We should handle error gracefully, i.e. not like this...
-            	System.out.println("Error processing request from " + sock.getRemoteSocketAddress());
-            	e.printStackTrace();
-            }
-        }
-	}//End of inner class HTTPRequest
 }//End of class WebServer
