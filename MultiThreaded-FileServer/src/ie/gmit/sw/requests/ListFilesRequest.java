@@ -21,7 +21,19 @@ public class ListFilesRequest extends Request {
 
 	@Override
 	public void run() {
+		try {
+			File folder = new File(filePath);
+			File[] files = folder.listFiles();
 		
+			ObjectOutputStream out = new ObjectOutputStream(super.getSocket().getOutputStream());
+			out.writeObject(files);
+			out.flush();
+			out.close();
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 	

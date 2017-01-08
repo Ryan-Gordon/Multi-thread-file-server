@@ -81,8 +81,13 @@ public class WebServer {
 					ObjectInputStream in = new ObjectInputStream(s.getInputStream());
 					Request request = (Request) in.readObject();
 					
+					//if we want to do a download or a printing of available files we will need to set the filepath first
 					if(request instanceof ListFilesRequest) {
-	                	((ListFilesRequest) request).setFilePath(filePath);
+	                	((ListFilesRequest) request).setFilePath(filePath); //Initialize the file path before firing the request
+	                	
+	                }
+					else if (request instanceof DownloadFileRequest) {
+	                	((DownloadFileRequest) request).setFilePath(filePath); //Initialize the file path before firing the request
 	                }
 					
 					//Run the job on its own thread

@@ -83,4 +83,53 @@ public class ServerCommandsService{
 		
         
 	}
+	public void downloadFile(String downloadDir) throws IOException, ClassNotFoundException {
+		Scanner console = new Scanner(System.in);
+		
+		System.out.print("Enter a file name from the list to download: ");
+		String fileName = console.next();
+		
+		
+				try {
+					s = new Socket(host, port);
+					clientIp = s.getLocalAddress().getHostAddress();
+					
+					//Serialise / marshal a request to the server
+					ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
+			        
+			        out.writeObject(new DownloadFileRequest(clientIp, fileName));
+			        out.flush();
+			
+			        Thread.yield(); //Pause the current thread for a short time
+			        
+			        ObjectInputStream in = new ObjectInputStream(s.getInputStream());
+			        String statusMsg = (String) in.readObject();
+			        System.out.println(statusMsg);
+			        if(statusMsg.equalsIgnoreCase("Success")){
+			        	byte[] byteArray = (byte[]) in.readObject();
+				        
+				        File file =  new File(downloadDir+File.separator+fileName);
+				        
+				        file.getParentFile().mkdirs();
+				        file.createNewFile();
+				        
+				        FileOutputStream fos = new FileOutputStream(file);
+				        
+				        fos.write(byteArray);
+				        fos.close();
+			        }
+			        
+			        
+				} catch (FileNotFoundException s){
+					System.out.println("File does not exist on the server. Returning");
+					return;
+				}
+				catch (Exception e) {
+					System.out.println("File does not exist on the server. Returning");
+					e.printStackTrace();
+				}
+			}
+		
+	
+
 }

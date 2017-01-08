@@ -17,7 +17,7 @@ public class ClientRunner {
 		int choice;
 		
 		Scanner in = new Scanner(System.in);
-
+		
 		
 		while(ui.isActive()){
 			ui.displayMenu();	
@@ -30,9 +30,11 @@ public class ClientRunner {
 				break;
 			case 2:
 				//get file list from server
+				commands.listFiles();
 				break;
 			case 3:
 				//prompt for input, then attempt to find the file
+				commands.downloadFile(conf.getDownload_dir());
 				break;
 			case 4:
 				//quit
