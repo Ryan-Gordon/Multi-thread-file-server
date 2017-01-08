@@ -28,7 +28,7 @@ public class ServerRunner {
 			if(args.length == 0){
 				String home = System.getProperty("user.home"); //get the home directory of the user
 				port = 7777; //the default value for server
-				filePath = home+"/Downloads/"; //the default directory is the downlaods folder of the user
+				filePath = home+"/Desktop/files"; //the default directory is the desktop folder of the server. 
 			}
 			else{
 				return;
